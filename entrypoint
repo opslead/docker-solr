@@ -1,0 +1,46 @@
+#!/bin/bash
+
+cd /opt/solr/server
+
+if [ $IMAGE_MODE == "exporter" ]; then
+    export CLASSPATH=/opt/solr/dist/*:/opt/solr/contrib/prometheus-exporter/lib/*:/opt/solr/contrib/prometheus-exporter/lucene-libs/*:/opt/solr/server/solr-webapp/webapp/WEB-INF/lib/*:/opt/solr/server/lib/ext/*
+
+    exec java -server -Xmx512m \
+        org.apache.solr.prometheus.exporter.SolrExporter \
+        -p 8080 \
+        -b http://$SOLR_CONTAINER:8080/solr \
+        -f /opt/solr/contrib/prometheus-exporter/conf/solr-exporter-config.xml \
+        -n 8
+else
+    exec java -server \
+        ${JAVA_ARGS:-"-Xmx512m"} \
+        -XX:+UseG1GC \
+        -XX:+PerfDisableSharedMem \
+        -XX:+ParallelRefProcEnabled \
+        -XX:MaxGCPauseMillis=250 \
+        -XX:+UseLargePages \
+        -XX:+AlwaysPreTouch \
+        -XX:+ExplicitGCInvokesConcurrent \
+        -Dsolr.jetty.inetaccess.includes= \
+        -Dsolr.jetty.inetaccess.excludes= \
+        -Djetty.port=8983 \
+        -DSTOP.PORT=7983 \
+        -DSTOP.KEY=solrrocks \
+        -Dhost=localhost \
+        -Duser.timezone=UTC \
+        -XX:-OmitStackTraceInFastThrow \
+        -XX:+CrashOnOutOfMemoryError \
+        -Djetty.home=/opt/solr/server \
+        -Dsolr.solr.home=/opt/solr/data \
+        -Dsolr.install.dir=/opt/solr \
+        -Dsolr.install.symDir=/opt/solr \
+        -Dsolr.default.confdir=/opt/solr/server/solr/configsets/_default/conf \
+        -Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager \
+        -Dlog4j.configurationFile=/opt/solr/server/resources/log4j2-console.xml \
+        -Xss256k \
+        -XX:CompileCommand=exclude,com.github.benmanes.caffeine.cache.BoundedLocalCache::put \
+        -DdisableAdminUI=false \
+        -jar /opt/solr/server/start.jar \
+        --module=http \
+        --module=gzip
+fi
