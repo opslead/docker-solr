@@ -33,6 +33,7 @@ RUN apt-get update && \
     apt-get clean
 
 # COPY security.json /opt/solr/data
+COPY solr.xml /opt/solr/data
 
 USER $SOLR_USER
 VOLUME ["/opt/solr/data/cores"]
