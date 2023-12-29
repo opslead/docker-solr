@@ -24,7 +24,7 @@ else
         -Dsolr.jetty.inetaccess.includes= \
         -Dsolr.jetty.inetaccess.excludes= \
         -Djetty.port=${SOLR_PORT} \
-        -Dhost=0.0.0.0 \
+        -Dsolr.jetty.host=0.0.0.0 \
         -DSTOP.PORT=7983 \
         -DSTOP.KEY=solrrocks \
         -Duser.timezone=UTC \
