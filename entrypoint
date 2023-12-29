@@ -23,10 +23,9 @@ else
         -XX:+ExplicitGCInvokesConcurrent \
         -Dsolr.jetty.inetaccess.includes= \
         -Dsolr.jetty.inetaccess.excludes= \
-        -Djetty.port=8983 \
+        -Djetty.port=${SOLR_PORT} \
         -DSTOP.PORT=7983 \
         -DSTOP.KEY=solrrocks \
-        -Dhost=localhost \
         -Duser.timezone=UTC \
         -XX:-OmitStackTraceInFastThrow \
         -XX:+CrashOnOutOfMemoryError \
